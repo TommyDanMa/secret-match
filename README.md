@@ -59,33 +59,8 @@ Uvicorn:Bashuvicorn app:app --reload
 ```
 Open your browser and navigate to http://127.0.0.1:8000.
 
-## 🌐 Deploying to Render (Free Tier)
 
-This repository is pre-configured for seamless deployment to [Render](https://render.com/).
-
-### Step-by-Step Deployment
-
-1. **Push your code to GitHub:**  
-   Ensure all your latest changes are pushed to a public or private GitHub repository.
-
-2. **Create a Web Service on Render:**
-   - Log into your Render Dashboard.
-   - Click **New +** > **Web Service**.
-   - Connect your GitHub account and select the `secret-match` repository.
-
-3. **Configure the Service:**
-   - **Name:** `secret-match` (or your preferred name)
-   - **Environment:** Python
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn app:app --host 0.0.0.0 --port $PORT`
-   - **Instance Type:** Free
-
-4. **Deploy:**  
-   Click **Create Web Service**. Once the build finishes, Render will provide a live public HTTPS URL (e.g., `https://secret-match.onrender.com`).
-
----
-
-## 🔒 Security & Privacy Overview
+## Security & Privacy Overview
 
 - **Salting & Hashing:** Because candidate lists are typically small (e.g., 8 names), simple hashes are vulnerable to local lookup attacks. To solve this, the server generates a unique cryptographic salt for every created challenge:
 
