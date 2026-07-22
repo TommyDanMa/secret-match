@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Created - Secret Match</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Challenge Created!</h1>
+        <p class="subtitle">Send this unique link to your friend. It can only be used once.</p>
+
+        <div class="url-box" id="shareUrl">{{ share_url }}</div>
+
+        <button onclick="copyUrl()">Copy Link</button>
+
+        <script>
+            function copyUrl() {
+                const urlText = document.getElementById("shareUrl").innerText;
+                navigator.clipboard.writeText(urlText).then(() => {
+                    alert("Link copied to clipboard!");
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Match - Create</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Secret Match</h1>
+        <p class="subtitle">Create a challenge to see if you and a friend pick the same option without revealing your pick.</p>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/create" method="post">
+            <div class="form-group">
+                <label for="names">Candidate Names (one per line):</label>
+                <textarea id="names" name="names" required placeholder="Alice&#10;Bob&#10;Charlie&#10;Diana&#10;Ethan&#10;Fiona&#10;George&#10;Hannah">{% if names %}{{ names }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="selected_name">Your Secret Selection:</label>
+                <input type="text" id="selected_name" name="selected_name" required value="{% if selected_name %}{{ selected_name }}{% endif %}" placeholder="e.g. Alice">
+            </div>
+
+            <button type="submit">Create Challenge Link</button>
+        </form>
+    </div>
+</body>
+</html>

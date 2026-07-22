@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Challenge - Secret Match</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Make Your Choice</h1>
+        <p class="subtitle">Select the person you think was chosen. You only get one attempt!</p>
+
+        <form action="/c/{{ token }}" method="post">
+            <div class="form-group radio-group">
+                {% for name in names %}
+                <label class="radio-label">
+                    <input type="radio" name="guess" value="{{ name }}" required>
+                    <span>{{ name }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Submit Guess</button>
+        </form>
+    </div>
+</body>
+</html>

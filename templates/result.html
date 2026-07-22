@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result - Secret Match</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        {% if status == 'success' %}
+            <h1>Result</h1>
+            <div class="result-badge {% if result == 'Match' %}match{% else %}no-match{% endif %}">
+                {{ result }}
+            </div>
+        {% else %}
+            <h1>Notice</h1>
+            <div class="error">
+                {{ message }}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
