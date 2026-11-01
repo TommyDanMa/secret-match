@@ -1,69 +1,73 @@
 # Secret Match
 
-A privacy-focused, zero-knowledge match verification web application built with **FastAPI**, **SQLite**, and **Jinja2**. 
+A small **FastAPI**, **SQLite**, and **Jinja2** application that lets two people
+compare a selection from a shared list. The other participant sees “Match” or
+“No match”; the server receives both submitted choices.
 
-Secret Match allows two people to check whether they selected the same person from a custom list without ever exposing or storing the chosen name in plain text, unless both users select the same candidate.
+## Privacy and security limits
 
----
+This is **not a formal zero-knowledge protocol**, private set intersection, or
+end-to-end encrypted matching. The server is trusted. It receives the creator's
+choice and the receiver's guess in plaintext request fields. It stores the full
+candidate list, a random salt, and SHA-256(salt + ":" + normalized choice), rather
+than storing a separate plaintext creator-choice column. The chosen name is still
+present among the stored candidates. Anyone with database access can enumerate
+that small list against the hash and infer the choice. Salting does not prevent
+this attack. Server operators, logging middleware, or compromised hosting may
+observe requests. A match reveals the common selection to the receiver.
 
-## Features
+A challenge URL is a bearer link: anyone holding it can see the list and consume
+the attempt. One valid submission consumes it even if the guess is wrong. A single
+conditional database update claims an unused, unexpired challenge, so only one
+concurrent submission can return a result. Links expire after 24 hours; rows are
+not automatically deleted. There is no account authentication, rate limiting, or
+comprehensive production security audit. Repeated newly created challenges and
+information outside the app can still reveal choices. Use fictional data for demos;
+do not use this prototype for sensitive personal information.
 
-* **Single-Use Links:** Every challenge URL can only be attempted **once**. After one submission, the challenge is permanently deactivated to prevent brute-force or guessing attacks.
-* **Expiration Enforcement:** Links automatically expire after a configurable timeframe (default: 24 hours).
-* **Cryptographically Secure Tokens:** Challenge URLs use high-entropy random tokens that cannot be guessed or enumerated.
-* **No Client-Side Reliance:** All security checks, hash comparisons, and one-time constraints are strictly enforced on the server.
-* **Zero Dependencies for Deployment:** Runs easily on free hosting tiers like Render using SQLite.
+## Local setup
 
----
+Use Python 3.11+ and run commands from the repository root:
 
-## Tech Stack
-
-* **Backend:** Python 3.11+, FastAPI, Uvicorn
-* **Database:** SQLite, SQLAlchemy ORM
-* **Frontend:** Jinja2 HTML Templates, Custom CSS
-* **Security:** Python `hashlib` (SHA-256) & `secrets` module
-
----
-
-## Quick Start (Local Development)
-
-### 1. Prerequisites
-Ensure you have **Python 3.11+** installed on your system.
-
-### 2. Setup & Installation
-
-Clone the repository and navigate into the project directory:
 ```bash
-git clone [https://github.com/YOUR_USERNAME/secret-match.git](https://github.com/YOUR_USERNAME/secret-match.git)
+git clone https://github.com/TommyDanMa/secret-match.git
 cd secret-match
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m uvicorn app:app --reload
 ```
-Create and activate a virtual environment (optional, but recommended):
+
+On Windows, activate with `.venv\Scripts\activate`. Open
+[the local application](http://127.0.0.1:8000/). SQLite creates `app.db` in the
+working directory. Keep that database and any `.env` files out of version control.
+Deployment requires Python dependencies and writable, persistent storage for SQLite;
+it does not have zero dependencies. Free hosting can sleep or lose ephemeral data.
+Use HTTPS for any hosted instance.
+
+## Fictional demonstration and regression checks
+
+1. Enter `Alice`, `Bob`, and `Charlie` as fictional candidates and select `Alice`.
+2. Open the generated link and choose `Alice`: the result is “Match”.
+3. Submit that link again: it is rejected as already completed.
+4. Create another challenge and guess `Bob`: “No match”, with no retry.
+
 ```bash
-# On macOS/Linux:
-python3 -m venv venv
-source venv/bin/activate
-
-# On Windows:
-python -m venv venv
-venv\Scripts\activate
+python -m pip install pytest httpx
+python -m pytest -q
 ```
-Install the required dependencies:
-```bash
-pip install -r requirements.txt
-```
-### 3. Run the Application
-Start the development server using
-```bash
-Uvicorn:Bashuvicorn app:app --reload
-```
-Open your browser and navigate to http://127.0.0.1:8000.
 
+The tests use a temporary SQLite database and fictional candidates. They exercise
+matching, mismatching, replay rejection, expiry, validation, and concurrent requests.
+A passing run supports these tested cases, not a universal privacy guarantee.
 
-## Security & Privacy Overview
+## Contributions and AI assistance
 
-- **Salting & Hashing:** Because candidate lists are typically small (e.g., 8 names), simple hashes are vulnerable to local lookup attacks. To solve this, the server generates a unique cryptographic salt for every created challenge:
-
-  ```math
-  Hash = SHA256(Salt ∥ Normalized_Name)
-  ```
-- **No Target Leakage:** The second user is shown only "Match" or "No match" upon submission, preventing any information leakage beyond the direct match result.
+Tommy identified the practical need and specified the requested functionality.
+Most of the original implementation was AI-generated; manually writing code was
+not the main objective. The exact original AI tool and file-level division of work
+are not recorded here. Codex produced the November 2026 conditional-update fix,
+regression tests, and documentation corrections. FastAPI, SQLAlchemy, Jinja2,
+Uvicorn, python-multipart and Pydantic provide external dependencies; Python's
+`hashlib` and `secrets` implement hashing and token generation. See `requirements.txt`
+and the source imports. No claim of original cryptographic research is made.
