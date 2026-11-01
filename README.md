@@ -8,7 +8,6 @@ Secret Match allows two people to check whether they selected the same person fr
 
 ## Features
 
-* **Zero-Knowledge Verification:** Names are never stored in plain text or simple, easy-to-guess hashes. The app uses unique per-challenge secret salts with SHA-256 digests.
 * **Single-Use Links:** Every challenge URL can only be attempted **once**. After one submission, the challenge is permanently deactivated to prevent brute-force or guessing attacks.
 * **Expiration Enforcement:** Links automatically expire after a configurable timeframe (default: 24 hours).
 * **Cryptographically Secure Tokens:** Challenge URLs use high-entropy random tokens that cannot be guessed or enumerated.
@@ -67,5 +66,4 @@ Open your browser and navigate to http://127.0.0.1:8000.
   ```math
   Hash = SHA256(Salt ∥ Normalized_Name)
   ```
-- **Race-Condition Safe:** The database marks a challenge as is_used = True before evaluating the match result, completely locking out concurrent or repeated attempts.
 - **No Target Leakage:** The second user is shown only "Match" or "No match" upon submission, preventing any information leakage beyond the direct match result.
