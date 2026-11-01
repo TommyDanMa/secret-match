@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from database import init_db, get_db
@@ -175,9 +176,22 @@ def submit_guess(
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
-    # Invalidate immediately to prevent race conditions or secondary submissions
-    challenge.is_used = True
+    # Claim the attempt with one conditional write. Concurrent requests may both
+    # read an active row, but only one may transition is_used from False to True.
+    claimed = db.execute(
+        update(Challenge)
+        .where(Challenge.token == token, Challenge.is_used.is_(False),
+               Challenge.expires_at >= now)
+        .values(is_used=True)
+        .execution_options(synchronize_session=False)
+    ).rowcount
     db.commit()
+    if claimed != 1:
+        return templates.TemplateResponse(
+            request, "result.html",
+            {"status": "invalid", "message": "This challenge is no longer active or has already been completed."},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
     # Compare hashes
     guest_hash = crypto.hash_choice(guess, challenge.salt)
