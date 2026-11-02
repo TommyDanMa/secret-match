@@ -63,7 +63,8 @@ A passing run supports these tested cases, not a universal privacy guarantee.
 
 ## Contributions and AI assistance
 
-Tommy identified the practical need and specified the requested functionality.
+Tommy identified the practical need and specified the requested functionality,
+including single-use challenge links and expiration.
 Most of the original implementation was AI-generated; manually writing code was
 not the main objective. The exact original AI tool and file-level division of work
 are not recorded here. Codex produced the November 2026 conditional-update fix,
